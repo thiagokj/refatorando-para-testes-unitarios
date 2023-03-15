@@ -6,7 +6,7 @@ Projeto para aprendizado e revisão de conceitos. [Curso balta.io](https://githu
 
 Alguns exemplos de códigos que funcionam, mas que não estão otimizados para performance, tratamento de exceções e testes de unidade.
 
-1. Classes anemicas - As Models possuem apenas propriedades primitivas e não tem comportamentos.
+1. Classes anêmicas - As Models possuem apenas propriedades primitivas e não tem comportamentos.
    Toda lógica de negócio está concentrada nos Controllers.
 
    ```csharp
@@ -25,13 +25,13 @@ Alguns exemplos de códigos que funcionam, mas que não estão otimizados para p
            public decimal Value { get; set; }
            public DateTime ExpireDate { get; set; }
 
-           // Poderiamos ter métodos aqui para geração e validação do código promocional
+           // Poderíamos ter métodos aqui para geração e validação do código promocional
        }
    }
    ```
 
 1. Alto acoplamento - Conforme citado, toda lógica está concentrada em um Controller, sendo necessário refatorar.
-   Problemas no unico método do controller chamado **Place**.
+   Problemas no único método do controller chamado **Place**.
    Varias conexões sendo instanciadas no controller. Deveria ser instanciada uma conexão fora do Controller, possibilitando criar casos de testes sem depender do banco de dados.
 
    ```csharp
@@ -47,7 +47,7 @@ Alguns exemplos de códigos que funcionam, mas que não estão otimizados para p
                using (var conn = new SqlConnection("CONN_STRING"))
                {
                    customer = conn.Query<Customer>
-                       // Usar o astericos retorna todos os campos da tabela, gastando mais recursos.
+                       // Usar o astérico retorna todos os campos da tabela, gastando mais recursos.
                        ("SELECT * FROM CUSTOMER WHERE ID=" + customerId)
                        .FirstOrDefault();
                }
@@ -70,7 +70,7 @@ Alguns exemplos de códigos que funcionam, mas que não estão otimizados para p
    request.Headers.Add("Accept", "application/json");
    request.Headers.Add("User-Agent", "HttpClientFactory-Sample");
 
-   // Gera outra dependência, agora com o HttpClient, tornando muito dificil um Mock para testes.
+   // Gera outra dependência, agora com o HttpClient, tornando muito difícil um Mock para testes.
     using (HttpClient client = new HttpClient())
    {
        var response = await client.SendAsync(request);
@@ -143,7 +143,7 @@ Alguns exemplos de códigos que funcionam, mas que não estão otimizados para p
    // Continuação do Place
 
    // #5 - Gera o pedido
-   // O pedido é instanciado aqui e não podemos mitigar possiveis erros.
+   // O pedido é instanciado aqui e não podemos mitigar possíveis erros.
    var order = new Order();
    order.Code = Guid.NewGuid().ToString().ToUpper().Substring(0, 8);
    order.Date = DateTime.Now;
@@ -154,7 +154,7 @@ Alguns exemplos de códigos que funcionam, mas que não estão otimizados para p
 
    // #6 - Calcula o total
    order.Total = subTotal - discount + deliveryFee;
-   //order.Total = 999. Alguem poderia deixar esse código aqui e alterar os novos pedidos na produção.
+   //order.Total = 999. Alguém poderia deixar esse código aqui e alterar os novos pedidos na produção.
 
    // #7 - Retorna
    return $"Pedido {order.Code} gerado com sucesso!";
@@ -168,11 +168,11 @@ Agora vamos organizar os passos para refatorar e melhorar o código.
 
    As regras de negócio devem ficar no domínio, que é o core da nossa aplicação.
 
-   Para iniciar, criamos as entidades, fazemos testes e garantimos que todo o fluxo de processo esteja ok. Posteriormente podem ser adicionados repositorios, queries, serviços, etc.
+   Para iniciar, criamos as entidades, fazemos testes e garantimos que todo o fluxo de processo esteja ok. Posteriormente podem ser adicionados repositórios, queries, serviços, etc.
 
-   O Domain Driven Design é sobre isso, executar testes na aplicação. O domínio deve ser o mais puro possivel, com o minimo de pacotes e firulas.
+   O Domain Driven Design é sobre isso, executar testes na aplicação. O domínio deve ser o mais puro possível, com o mínimo de pacotes e firulas.
 
-1. Crie as Entidades com a representação basica dos dados. Posteriormente será feito aprimoramento.
+1. Crie as Entidades com a representação básica dos dados. Posteriormente será feito aprimoramento.
 
    ```csharp
    public class Customer
@@ -283,13 +283,13 @@ Agora vamos organizar os passos para refatorar e melhorar o código.
     }
    ```
 
-1. Para finalizar temos a Entidade Pedido, que comtempla todos os itens do pedido
+1. Para finalizar temos a Entidade Pedido, que contempla todos os itens do pedido
 
    ```csharp
    public class Order : Entity
    {
         // Novamente blindamos o construtor,
-        // permitindo apenas parametros respectivos a essa entidade
+        // permitindo apenas parâmetros respectivos a essa entidade
         public Order(Customer customer, decimal deliveryFee, Discount discount)
         {
            Customer = customer;
@@ -321,7 +321,7 @@ Agora vamos organizar os passos para refatorar e melhorar o código.
            foreach (var item in Items)
            {
                // A regra de totalização do Item está blindada nas regras de negócio da entidade Item.
-               // Caso haja mudança na regra, é necessario alterar apenas em um único lugar.
+               // Caso haja mudança na regra, é necessário alterar apenas em um único lugar.
                total += item.Total();
            }
 
@@ -372,7 +372,7 @@ Obs: Evite lançar **exceptions**. As exceções devem ser usadas para situaçõ
 - Serviços indisponíveis
 - Bloqueio por regra de segurança de rede
 
-Podemos então trabalhar com **Notificações de Domínio**. A sugestão é usar o Flunt - Fluent Validations. Esse pacote já contempla as validações comuns e torna o código mais facil de validar e testar.
+Podemos então trabalhar com **Notificações de Domínio**. A sugestão é usar o Flunt - Fluent Validations. Esse pacote já contempla as validações comuns e torna o código mais fácil de validar e testar.
 Adicione o pacote **dotnet add package Flunt**.
 
 Refatorando as entidades com notificações temos:
@@ -434,7 +434,7 @@ public class OrderTests
 {
     // Decoração indicando que é um método de testes, habilitando funções de debug.
     [TestMethod]
-    // Decoração agrupandos os testes por categoria. Funções visíveis no Visual Studio.
+    // Decoração agrupando os testes por categoria. Funções visíveis no Visual Studio.
     [TestCategory("Domain")]
     // Deve retornar um novo pedido com um numero de 8 caracteres
     public void ShouldReturnNewOrderWithNumberHavingEightCharacters()
@@ -598,7 +598,7 @@ public class OrderTests
 
 ## Testando Queries
 
-Para testar as queries, é necessário converter os SQL's em Expressions, abstraindo as consultas da depêndencia do banco de dados.
+Para testar as queries, é necessário converter os SQL's em Expressions, abstraindo as consultas da dependência do banco de dados.
 
 ```csharp
 public static class ProductQueries
@@ -616,9 +616,9 @@ public static class ProductQueries
 
 ## Repositórios
 
-Os repositórios são uma abstração do banco, criando uma unidade de acesso unico aos dados.
+Os repositórios são uma abstração do banco, criando uma unidade de acesso único aos dados.
 
-Ex: ClienteRepo.cs -> fica responsável pelo CRUD do Clientes e também quaisquer outros métodos que possam ser úteis para tornar mais facil trabalhar com os dados.
+Ex: ClienteRepo.cs -> fica responsável pelo CRUD do Clientes e também quaisquer outros métodos que possam ser úteis para tornar mais fácil trabalhar com os dados.
 
 Facilita muito a migração para outros bancos, para micro serviços, leitura de um arquivo texto e qualquer fonte de dados.
 
@@ -649,7 +649,7 @@ namespace Store.Domain.Repositories.Interfaces
 
 ## Mocks com base nos Repositórios
 
-É hora de simular os dados para efetuar testes. Esse é mais uma vantagem de usar o padrão de repositorios, a facilidade para fazer testes.
+É hora de simular os dados para efetuar testes. Esse é mais uma vantagem de usar o padrão de repositórios, a facilidade para fazer testes.
 
 ```csharp
 public class FakeCostumerRepository : ICustomerRepository
@@ -746,7 +746,7 @@ public class GenericCommandResult : ICommandResult
     public bool Success { get; set; }
     public string Message { get; set; }
     public object Data { get; set; }
-    // Poderiamos ter uma propriedade Erros aqui, retornando todos os erros em uma lista
+    // Poderíamos ter uma propriedade Erros aqui, retornando todos os erros em uma lista
 }
 ```
 
@@ -799,7 +799,7 @@ public class CreateOrderCommandTests
         command.Items.Add(new CreateOrderItemCommand(Guid.NewGuid(), 1));
         command.Items.Add(new CreateOrderItemCommand(Guid.NewGuid(), 1));
 
-        // O validade adiciona notificações de falha caso as condicições especificadas
+        // O validade adiciona notificações de falha caso as condições especificadas
         // não sejam atendidas.
         command.Validate();
 
@@ -811,7 +811,7 @@ public class CreateOrderCommandTests
 
 ## Handlers
 
-Os **Handlers** tem a função de gerenciar o fluxo da aplicação. Normalmente as aplicações tem os Inputs do usuario (entradas), processamento e Output (retorno / saída / resultado).
+Os **Handlers** tem a função de gerenciar o fluxo da aplicação. Normalmente as aplicações tem os Inputs do usuário (entradas), processamento e Output (retorno / saída / resultado).
 
 Handler -> Recebe um comando -> Gerencia o fluxo de pedido -> Retorna um comando para tela (CommandResult).
 
@@ -823,11 +823,11 @@ Nesse caso, temos o fluxo de processo para gerar um pedido:
 4. Cadastro de item do pedido.
 5. Cadastro de pedido com todos os itens anteriores.
 
-Utilizando um manipulador, tornamos ainda mais facil realizar testes no fluxo da aplicação, facilitando a investigação em caso de problemas.
+Utilizando um manipulador, tornamos ainda mais fácil realizar testes no fluxo da aplicação, facilitando a investigação em caso de problemas.
 
 ```csharp
 // IHandler de TIPO genérico (T) com implementação obrigatória de ICommand
-// Esse T sigfinica o TIPO. É uma convenção que indica o uso genérico de qualquer classe.
+// Esse T significa o TIPO. É uma convenção que indica o uso genérico de qualquer classe.
 public interface IHandler<T> where T : ICommand
 {
     // Ao implementar a interface, será necessário implementar o retorno do comando
@@ -846,7 +846,7 @@ public class OrderHandler : Notifiable<Notification>, IHandler<CreateOrderComman
 ...
 ```
 
-A sequencia logíca de declarações no OrderHandler:
+A sequencia lógica de declarações no OrderHandler:
 
 Serviços externos -> Repositórios -> Construtor com repositórios -> Implementação do resultado do comando.
 
