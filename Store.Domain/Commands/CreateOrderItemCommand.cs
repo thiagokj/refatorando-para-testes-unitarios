@@ -17,7 +17,7 @@ public class CreateOrderItemCommand : Notifiable<Notification>, ICommand
     public Guid Product { get; set; }
     public int Quantity { get; set; }
 
-    public void Validate()
+    public bool Validate()
     {
         AddNotifications(new Contract<CreateOrderItemCommand>()
             .Requires()
@@ -25,5 +25,7 @@ public class CreateOrderItemCommand : Notifiable<Notification>, ICommand
             "Product", "Produto inválido")
             .IsGreaterThan(Quantity, 0, "Quantity", "Quantidade inválida")
         );
+
+        return IsValid;
     }
 }

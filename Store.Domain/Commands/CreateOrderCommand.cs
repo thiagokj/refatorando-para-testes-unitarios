@@ -29,7 +29,7 @@ public class CreateOrderCommand : Notifiable<Notification>, ICommand
     public string PromoCode { get; set; }
     public IList<CreateOrderItemCommand> Items { get; set; }
 
-    public void Validate()
+    public bool Validate()
     {
         AddNotifications(new Contract<CreateOrderCommand>()
             .Requires()
@@ -39,5 +39,7 @@ public class CreateOrderCommand : Notifiable<Notification>, ICommand
              "CEP inválido")
             .IsNotNullOrEmpty(ZipCode, "CreateOrderCommand.ZipCode")
         );
+
+        return IsValid;
     }
 }

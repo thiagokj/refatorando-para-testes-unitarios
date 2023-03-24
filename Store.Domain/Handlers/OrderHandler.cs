@@ -36,8 +36,7 @@ public class OrderHandler : Notifiable<Notification>, IHandler<CreateOrderComman
     public ICommandResult Handle(CreateOrderCommand command)
     {
         // Sempre começando com Fail Fast Validation ;)
-        command.Validate();
-        if (!command.IsValid)
+        if (command.Validate())
             return new GenericCommandResult(false, "Pedido inválido", null);
 
         // 1. Recupera o cliente

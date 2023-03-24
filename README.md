@@ -725,7 +725,7 @@ Vamos pensar no Command como um objeto de transporte. São a entrada das informa
 // Retornar antecipadamente erros é uma forma de evitar gastar recursos desnecessários.
 public interface ICommand
 {
-    void Validate();
+    bool Validate();
 }
 ```
 
@@ -770,7 +770,7 @@ public class CreateOrderItemCommand : Notifiable<Notification>, ICommand
 
         // O item do pedido deve possuir um código de produto de 32 caracteres.
         // A quantidade do item do pedido deve ser maior que zero.
-        public void Validate()
+        public bool Validate()
         {
             AddNotifications(new Contract<CreateOrderItemCommand>()
                 .Requires()
@@ -778,6 +778,8 @@ public class CreateOrderItemCommand : Notifiable<Notification>, ICommand
                 "Product", "Produto inválido")
                 .IsGreaterThan(Quantity, 0, "Quantity", "Quantidade inválida")
             );
+
+            return IsValid;
         }
     }
 ```
@@ -878,9 +880,8 @@ public class OrderHandler : Notifiable<Notification>, IHandler<CreateOrderComman
 
     public ICommandResult Handle(CreateOrderCommand command)
     {
-        // Sempre começando com Fail Fast Validation ;)
-        command.Validate();
-        if (!command.IsValid)
+        // Sempre começando com Fail Fast Validation
+        if (command.Validate())
             return new GenericCommandResult(false, "Pedido inválido", null);
 
         // 1. Recupera o cliente
